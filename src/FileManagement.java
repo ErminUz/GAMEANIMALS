@@ -35,6 +35,14 @@ public class FileManagement {
 
     // följande två metoder kan förkortas till endast en genom att ha en tredje parameter
     // en string som ger ett körsätt om den är food eller animal
+    private static void clearAttrAnimalList(){
+        attributeValuesAnimal.clear();
+    }
+
+    private static void clearAttrFoodList(){
+        attributeValuesFood.clear();
+    }
+
     public static void readAnimalsIn(){
         String info = "";
         try{
@@ -67,8 +75,22 @@ public class FileManagement {
         return generatedWeight;
     }
 
-    public static void createAnimalWhileRunning(ArrayList<String[]> attributesList){
-        String[] animalSpecie = getAnimalClassFromList(attributesList);
+    private static void readInAnimalsWhileRunning(){
+        clearAttrAnimalList();
+        String info = "";
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textAddAnimals)));
+            while((info = br.readLine()) != null){
+                attributeValuesAnimal.add(info.split(" "));
+            }
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void createAnimalWhileRunning(){
+        readInAnimalsWhileRunning();
+        String[] animalSpecie = getAnimalClassFromList(attributeValuesAnimal);
         int i = 0;
         for(String animal : animalSpecie){
             if(animal.equals("Mammal")){
@@ -123,9 +145,9 @@ public class FileManagement {
 
     }
 
-    public static void createAnimal(ArrayList<String[]> attributesList){
+    public static void createAnimal(){
         readAnimalsIn();
-        String[] animalSpecie = getAnimalClassFromList(attributesList);
+        String[] animalSpecie = getAnimalClassFromList(attributeValuesFood);
         int i = 0;
         for(String animal : animalSpecie){
             if(animal.equals("Mammal")){
@@ -202,8 +224,22 @@ public class FileManagement {
         }
     }
 
-    public static void createFoodWhileRunning(ArrayList<String[]> attributesList){
-        String[] food = getFoodClassFromList(attributesList);
+    private static void readFoodsInWhileRunning(){
+        clearAttrFoodList();
+        String info = "";
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textAddFoods)));
+            while((info = br.readLine()) != null){
+                attributeValuesAnimal.add(info.split(" "));
+            }
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void createFoodWhileRunning(){
+        readFoodsInWhileRunning();
+        String[] food = getFoodClassFromList(attributeValuesFood);
         int i = 0;
         for(String x : food){
             if(x.equals("Carbs")){
@@ -234,9 +270,9 @@ public class FileManagement {
         }
     }
 
-    public static void createFood(Path file, ArrayList<String[]> attributesList){
+    public static void createFood(){
         readFoodsIn();
-        String[] food = getFoodClassFromList(attributesList);
+        String[] food = getFoodClassFromList(attributeValuesFood);
         int i = 0;
         for(String x : food){
             if(x.equals("Carbs")){
@@ -278,6 +314,7 @@ public class FileManagement {
         return eachLineFoodArr;
     }
 
+    /*
     private static void loadAddedAnimals(Path file, ArrayList<String[]> addingTo){
         String info = " ";
         try{
@@ -286,27 +323,26 @@ public class FileManagement {
                 addingTo.add(info.split(" "));;
             }
 
-            createAnimalWhileRunning(addingTo);
+            createAnimalWhileRunning();
         } catch(IOException e){
             System.out.println(e.getMessage());
         }
     }
-
-
 
     public static void loadAddedFood(Path file, ArrayList<String[]> addingTo){
         String info = " ";
         try{
-            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(file)));
+            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textFoods)));
             while((info = br.readLine()) != null){
-                addingTo.add(info.split(" "));
+                attributeValuesFood.add(info.split(" "));
             }
 
-            createFoodWhileRunning(addingTo);
+            createFoodWhileRunning(attributeValuesFood);
         } catch(IOException e){
             System.out.println(e.getMessage());
         }
     }
+    */
 
     public static ArrayList<Animal> getAnimals(){
         return animals;
