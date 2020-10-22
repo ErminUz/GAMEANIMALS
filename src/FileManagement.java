@@ -1,9 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FileManagement {
@@ -19,6 +23,9 @@ public class FileManagement {
     // filen som läses när metoden add food väljs. Förmodat att man skrivit till fil innan man kallar metod
     private static Path textAddFoods;
 
+    //
+    private static Path whatAnimalEats = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/animalEats");
+
     // förmodligen för om jag klarar funktionen spara gaming session för att återuppta senare
     private static Path storage;
 
@@ -33,6 +40,14 @@ public class FileManagement {
     private static ArrayList<String[]> attributeValuesFood = new ArrayList<>();
     //private static ArrayList<Game> gameSessions = new ArrayList<>();
 
+    //
+    private static ArrayList<String> animalSpecies = new ArrayList<>();
+
+    // antingen har jag en arraylist av typen arraylist string array, eller bara arraylist av typen string array
+    private static ArrayList<String[]> whatAnimalEatsLists = new ArrayList<>();
+    private static HashMap<String, List<String>> whatAnimalsEat = new HashMap<>();
+    //private static ArrayList<HashMap>
+
     // följande två metoder kan förkortas till endast en genom att ha en tredje parameter
     // en string som ger ett körsätt om den är food eller animal
     private static void clearAttrAnimalList(){
@@ -43,13 +58,28 @@ public class FileManagement {
         attributeValuesFood.clear();
     }
 
+    private static void addSpecieOnlyOnce(String specie){
+        if(animalSpecies.contains(specie)){
+        }else{
+            animalSpecies.add(specie);
+        }
+    }
+
     public static void readAnimalsIn(){
         String info = "";
         try{
             BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textAnimals)));
             while((info = br.readLine()) != null){
-                attributeValuesAnimal.add(info.split(" "));
+                String[] s = info.split(" ");
+                attributeValuesAnimal.add(s);
+                //attributeValuesAnimal.add(info.split(" "));
+                String specie = s[1];
+                addSpecieOnlyOnce(specie);
+                //animalSpecies.add(specie);
+                //setWhatAnimalEats(); // tror den bör vara här. nej nog inte här utan utanför while
+                //readInWhatAnimalEats(); //tror den kan var här...
             }
+            setWhatAnimalEats();
         } catch(IOException e){
             System.out.println(e.getMessage());
         }
@@ -147,7 +177,7 @@ public class FileManagement {
 
     public static void createAnimal(){
         readAnimalsIn();
-        String[] animalSpecie = getAnimalClassFromList(attributeValuesFood);
+        String[] animalSpecie = getAnimalClassFromList(attributeValuesAnimal);
         int i = 0;
         for(String animal : animalSpecie){
             if(animal.equals("Mammal")){
@@ -158,10 +188,10 @@ public class FileManagement {
                     // ha kanske en prompt som ber dig döpa djuret
                     String weightRange = attr[3];
                     String specie = attr[1];
-                    int weight = generateWeight(weightRange);
-                    // jag kanske kan deklrarera age på samma sätt som weight
+                    int weight = generateWeight(weightRange); // generateWeight(attr[3]);
+                    // jag kanske kan deklarera age på samma sätt som weight
                     int age = Integer.parseInt(attr[4]);
-                    int price = Integer.parseInt(attr[5]);
+                    double price = Double.parseDouble(attr[5]);
                     Mammal mammal = new Mammal(specie, weight, age, price);
                     animals.add(mammal);
                     counter++;
@@ -176,7 +206,7 @@ public class FileManagement {
                     String specie = attr[1];
                     int weight = generateWeight(weightRange);
                     int age = Integer.parseInt(attr[4]);
-                    int price = Integer.parseInt(attr[5]);
+                    double price = Double.parseDouble(attr[5]);
                     Fish fish = new Fish(specie, weight, age, price);
                     animals.add(fish);
                     counter++;
@@ -191,7 +221,7 @@ public class FileManagement {
                     String specie = attr[1];
                     int weight = generateWeight(weightRange);
                     int age = Integer.parseInt(attr[4]);
-                    int price = Integer.parseInt(attr[5]);
+                    double price = Double.parseDouble(attr[5]);
                     Bird bird = new Bird(specie, weight, age, price);
                     animals.add(bird);
                     counter++;
@@ -212,7 +242,7 @@ public class FileManagement {
         return eachLineAnimalArr;
     }
 
-    private static void readFoodsIn(){
+    public static void readFoodsIn(){
         String info = "";
         try{
             BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textFoods)));
@@ -344,6 +374,47 @@ public class FileManagement {
     }
     */
 
+    //vart ska denna köras ifrån?
+    public static void setWhatAnimalEats(){
+        readInWhatAnimalEats();
+    }
+
+    //tror inte denna behöver return type...?
+    private static void readInWhatAnimalEats(){
+        String info = "";
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(whatAnimalEats)));
+            while((info = br.readLine()) != null){
+                //ArrayList<String[]> createdList = new ArrayList<>();
+                //createdList.add(info.split(" "));
+                //whatAnimalEatsLists.add(createdList);
+                whatAnimalEatsLists.add(info.split(" "));
+            }
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+        }
+
+        transferToHashMap();
+    }
+
+    private static void transferToHashMap(){
+        for(String[] s : whatAnimalEatsLists){
+            for(String specie : animalSpecies){
+                if(s[0].equals(specie)){
+                    String key = specie;
+                    StringBuilder value = new StringBuilder();
+                    for(int i = 1; i < s.length; i++){
+                        value.append(s[i]).append(" ");
+                    }
+
+                    String[] sArr = value.toString().split(" ");
+                    List<String> values = Arrays.asList(sArr);
+                    whatAnimalsEat.put(key, values);
+                }
+            }
+        }
+    }
+
     public static ArrayList<Animal> getAnimals(){
         return animals;
     }
@@ -351,6 +422,32 @@ public class FileManagement {
     public static ArrayList<Food> getFoods(){
         return foods;
     }
+
+    public static HashMap<String, List<String>> getWhatAnimalsEatStorage(){
+        return whatAnimalsEat;
+    }
+
+    public static ArrayList<String[]> getAttributeValuesAnimal(){
+        return attributeValuesAnimal;
+    }
+
+    public static void printClassesAnimalsAdded(){
+        String[] classes = getAnimalClassFromList(attributeValuesAnimal);
+        for(String animalClass : classes){
+            System.out.println(animalClass);
+        }
+    }
+
+    public static void refresh(){
+        animals.clear();
+        foods.clear();
+        attributeValuesAnimal.clear();
+        attributeValuesFood.clear();
+        whatAnimalEatsLists.clear();
+        whatAnimalsEat.clear();
+    }
+
+
 
     public static void save(Path file){
 
