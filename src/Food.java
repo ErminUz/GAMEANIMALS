@@ -17,8 +17,22 @@ abstract class Food {
         return pricekg;
     }
 
+    public void setWeight(int weight){
+        this.weight = weight;
+    }
+
     public int getWeight(){
         return weight;
+    }
+
+    public int calcPrice(int weightGrams){
+        int pricePerGrams = this.getPricekg() / 1000;
+        return weightGrams * pricePerGrams;
+
+    }
+
+    public boolean removeFromStock(){
+        return this.getWeight() <= 0;
     }
 
     public String toString(){
