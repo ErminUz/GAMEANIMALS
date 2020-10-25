@@ -59,6 +59,7 @@ public class IO {
         System.out.println(gameName);
         System.out.println(gameStats);
         System.out.println("-".repeat(50));
+        //System.out.println(player.getName() + "s turn");
 
         int i = 1;
         for(String option : gameOptions){

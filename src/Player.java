@@ -11,7 +11,7 @@ public class Player {
 
     public Player(String name){
         this.name = name;
-        this.money = 2000;
+        this.money = 1000;
         this.animals = new ArrayList<>();
         this.foods = new ArrayList<>();
     }
@@ -100,6 +100,9 @@ public class Player {
 
     public void setBalance(double balance){
         this.money = balance;
+        if(this.money <= 0){
+            this.money = 0;
+        }
     }
 
     public double getMoney(){
@@ -155,10 +158,10 @@ public class Player {
         if(getFood().size() == 0){
             sb.append("(Player ").append(getName()).append("): You currently don't own any food, buy some in the store");
         }else{
-            sb.append("Player: " + getName() + "s food:");
+            sb.append("Player: ").append(getName()).append("s food:\n");
             int i = 0;
             for(Food food : this.getFood()){
-                sb.append(i+1).append(food.getFood()).append(", weight: ").append(food.getWeight()).append("\n");
+                sb.append(i+1).append(". ").append(food.getFood()).append(", weight: ").append(food.getWeight()).append("kg").append("\n");
                 i++;
             }
         }
@@ -168,6 +171,40 @@ public class Player {
 
     private boolean birth(){
         return new Random().nextBoolean();
+    }
+
+    /*
+    public String dead(Animal animal){
+        String msg = "";
+        if(animal.getHealthPoints() == 0){
+            this.animals.remove(animal);
+            msg += animal.getSpecie();
+        }
+        return msg;
+    }
+    */
+
+    private boolean dead(Animal animal){
+        if(animal.getHealthPoints() == 0){
+            //this.animals.remove(animal);
+            return true;
+        }
+        return false;
+    }
+
+    public String announceDead(){
+        StringBuilder sb = new StringBuilder();
+        //sb.append(this.getName()).append(", dead animals: ");
+        for(int i = 0; i < this.getAnimals().size(); i++){
+            Animal animal = this.getAnimals().get(i);
+            sb.append(this.getName()).append(", dead animals: ");
+            if(dead(animal)){
+                this.getAnimals().remove(animal);
+                sb.append(" ").append(animal.getSpecie()).append(" ");
+            }
+        }
+
+        return sb.toString();
     }
 
     public void breed(Animal male, Animal female){

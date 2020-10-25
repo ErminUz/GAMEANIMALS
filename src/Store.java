@@ -234,20 +234,36 @@ public class Store {
             // innuti här ska spelaren samla på sig så mycket djur den kan och sålänge den har råd
             Collections.shuffle(animalStock); // tror man får ha en ny referens typ här, en ny arrayList
 
+            // måste hantera bättre om du inte har pengar, denna säger inte åt användaren tydligt
+            /*
             int i = 0;
             while(canAffordAnything(player) > 0){
+                //player.getAnimals().add(animalStock.get(i));
                 player.addAnimal(animalStock.get(i));
                 animalStock.remove(animalStock.get(i));
                 double balance = player.getMoney() - animalStock.get(i).getPrice();
                 player.setBalance(balance);
                 i++;
             }
+            */
+            int i = 0;
+            boolean buy = true;
+            while(buy){
+                if(canAffordAnything(player) > 0 && !animalStock.isEmpty()){
+                    player.addAnimal(animalStock.get(i));
+                    double balance = player.getMoney() - animalStock.get(i).getPrice();
+                    player.setBalance(balance);
+                    animalStock.remove(animalStock.get(i));
+                }else{
+                    System.out.println("Can't afford anything");
+                    buy = false;
+                }
+            }
 
             System.out.println("Animal/s owned: ");
             for(Animal animal : player.getAnimals()){
                 System.out.println(animal.getSpecie());
             }
-
         }else if(choice.toLowerCase().equals("food") && selectOrRandom.toLowerCase().equals("manually")){
             boolean canBuy = true;
             //listAnimalPrices();
@@ -255,7 +271,8 @@ public class Store {
             while(canBuy){
                 // behövs ändå en kontroll ifall player har pengar
                 // finns inge pengar går vi ut ur while
-                if(player.getMoney() == 0){
+                if(player.getMoney() == 0 || foodStock.isEmpty()){
+                    System.out.println("No money or food is out"); // för nu, men ändra så att man vet mer exakt varför
                     canBuy = false;
                 }else{
                     //kan kanske skapa en metod för att visa vad som är affordable
@@ -263,23 +280,31 @@ public class Store {
                     int foodChoice = IO.promptInt("Choose a food") - 1;
                     //int amountGrams = IO.promptInt("Enter amount you wish to buy in grams");
                     Food chosenFood = foodStock.get(foodChoice);
+                    String subClass = chosenFood.getClass().getSimpleName();
+                    String food = chosenFood.getFood();
+                    int priceKg = chosenFood.getPricekg();
                     int priceFoodPerGrams = chosenFood.getPricekg() / 1000;
                     int maxAmountBuy = howMuchCanBeBought(player, chosenFood);
                     IO.prompt("You afford up to following amount: " + maxAmountBuy + "g of " + chosenFood.getFood() + "s");
                     int amountGrams = IO.promptInt("Enter amount you wish to buy in grams");
                     int amountAfford = (int)(priceFoodPerGrams * player.getMoney());
-                    if(amountGrams <= amountAfford && amountGrams <= maxAmountBuy){
+                    if(amountGrams <= maxAmountBuy){
                         IO.prompt("You've bought " + amountGrams + "g of " + chosenFood.getFood() + "s");
                         int cost = amountGrams * priceFoodPerGrams;
                         double balance = player.getMoney() - cost;
                         player.setBalance(balance);
-                        player.addFood(chosenFood, (amountGrams / 1000));
+                        Food foodToAdd = addFoodToPlayerFoodList(subClass, food, priceKg, (amountGrams / 1000));
+                        player.updateFoodList(foodToAdd);
+                        //player.addFood(chosenFood, (amountGrams / 1000));
                         chosenFood.setWeight(chosenFood.getWeight() - (amountGrams / 1000));
-                        //foodStock.remove(chosenFood); fel!
+                        //foodStock.remove(chosenFood); fel
+                        if(chosenFood.getWeight() >= 0){
+                            foodStock.remove(chosenFood);
+                        }
                     }
                 }
             }
-            IO.prompt("That's all you can buy");
+            //IO.prompt("That's all you can buy");
         }else if(choice.toLowerCase().equals("food") && selectOrRandom.toLowerCase().equals("auto")){
             // buy as long as possible; as long as player can afford it. How do deal with amount...?
             // player can choose a amount and the rest is randomized; type of food being bought.
@@ -341,8 +366,6 @@ public class Store {
             for(Food food : foodStock){
                 System.out.println(food.getFood() + ", weight: " + food.getWeight() + "kg");
             }
-
-
         }
         // här kan nog hela inventory skrivas
     }
@@ -372,7 +395,7 @@ public class Store {
         int foodQuantityInGrams = food.getWeight() * 1000;
         int foodPricePerGrams = food.getPricekg() / 1000;
         double balance = player.getMoney();
-        int amountGramsCanBuy = (int) (player.getMoney() * foodPricePerGrams);
+        int amountGramsCanBuy = (int) (player.getMoney() / foodPricePerGrams);
         if(amountGramsCanBuy > foodQuantityInGrams){
             amountGramsCanBuy = foodQuantityInGrams;
         }

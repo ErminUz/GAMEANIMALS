@@ -14,6 +14,10 @@ abstract class Animal {
     private ArrayList<Animal> offspring;
     private List<String> preferableFoods;
 
+    //denna sätts till false i konstruktorn, djur är friska från början och de föds friska
+    private boolean sick;
+
+
     /*
     ett djur kan äta 1-3 sorters mat man har. Jag har 3 sorters klasser: carbs, fat och protein. Jag hade kunnat lägga in
     en siffra 1-3 som indikerar på hur många sorter djuret kan äta. Tex en häst hade fått 2 vilka är carbs och fat. Men då
@@ -223,6 +227,10 @@ abstract class Animal {
 
     public void setHealthPoints(double health){
         this.healthPoints = health;
+        this.healthPoints = Math.round(this.healthPoints * 10) / 10.0;
+        if(this.healthPoints <= 0.0){
+            this.healthPoints = 0.0;
+        }
     }
 
     public double getHealthPoints(){
@@ -249,11 +257,20 @@ abstract class Animal {
         return preferableFoods;
     }
 
+    public boolean isSick(){
+        return sick;
+    }
+
     public String toString(){
         String hasOffspring = hasOffspring() ? "yes" : "no";
         return "specie: " + getSpecie() + ", weight: " + getWeight() + "kg, age: " +
                 getAge() + ", offspring: " + hasOffspring;
     }
+
+    public void sick(){
+
+    }
+
     /*
     public String whatIEat(){
         StringBuilder sb = new StringBuilder();
