@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,7 +25,7 @@ public class FileManagement {
     private static Path whatAnimalEats = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/animalEats");
 
     // förmodligen för om jag klarar funktionen spara gaming session för att återuppta senare
-    private static Path storage;
+    private static Path gameSessionsFile = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/gameSessions.ser");
 
     // när man lägger till extra objekt under körning av program kan de lagras i en lista med string arrays
     // för att sedan göras om till objekt utifrån värdena i arrayn.
@@ -447,9 +445,30 @@ public class FileManagement {
         whatAnimalsEat.clear();
     }
 
-
-
-    public static void save(Path file){
-
+    /*
+    public static void save(Session session){
+        try{
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(String.valueOf(gameSessionsFile)));
+            oos.writeObject(session);
+            oos.close();
+            System.out.println("Saved game to file: " + session.getDate());
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+        }
     }
+
+
+    public static ArrayList<Session> load(){
+        ArrayList<Session> sessions = new ArrayList<>();
+        try{
+           ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(gameSessionsFile)));
+           sessions.add((Session) ois.readObject());
+           ois.close();
+        } catch(ClassNotFoundException | IOException e){
+            System.out.println(e.getMessage());
+        }
+
+        return sessions;
+    }
+    */
 }

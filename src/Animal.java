@@ -1,10 +1,11 @@
 import java.io.File;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-abstract class Animal {
+abstract class Animal implements Serializable {
     private String specie;
     private int weight;
     private int age;
@@ -128,7 +129,7 @@ abstract class Animal {
 
     public void eat(Food food, double amount) {
         int originalFoodWeight = food.getWeight();
-        if(this.getHealthPoints() <= 100){
+        if(this.getHealthPoints() >= 100){
             System.out.println("Animal has full health");
         }else{
             if(canEat(food)){
@@ -230,6 +231,8 @@ abstract class Animal {
         this.healthPoints = Math.round(this.healthPoints * 10) / 10.0;
         if(this.healthPoints <= 0.0){
             this.healthPoints = 0.0;
+        }else if(this.healthPoints > 100.0){
+            this.healthPoints = 100.0;
         }
     }
 

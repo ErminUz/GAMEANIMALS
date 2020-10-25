@@ -53,10 +53,14 @@ public class IO {
         return choice < 1 || choice > options.length ? startMenu(gameName, options) : choice;
     }
 
-    public static int gameOptions(String gameName, String gameStats, String ...gameOptions){
+    public static int gameOptions(String lastRound, String gameName, int roundNum, String gameStats, String ...gameOptions){
         clear();
         System.out.println("-".repeat(50));
         System.out.println(gameName);
+        System.out.println("(round: " + roundNum + ")");
+        System.out.println("--------------------LAST ROUND--------------------");
+        System.out.println(lastRound);
+        System.out.println("---------------------ROUND " + roundNum + "----------------------");
         System.out.println(gameStats);
         System.out.println("-".repeat(50));
         //System.out.println(player.getName() + "s turn");
@@ -75,7 +79,7 @@ public class IO {
             System.out.println(e.getMessage());
         }
 
-        return choice < 1 || choice > gameOptions.length ? gameOptions(gameName, gameStats, gameOptions) : choice;
+        return choice < 1 || choice > gameOptions.length ? gameOptions(lastRound, gameName, roundNum, gameStats, gameOptions) : choice;
     }
 
 }

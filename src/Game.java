@@ -1,50 +1,56 @@
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 
-public class Game {
+public class Game implements Serializable {
     private Store store;
     private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<Player> playersEnd = new ArrayList<>();
-    // kanske lägga till i denna spelarna som varit med i en spelomgång, om den infon behövs...?
-    private ArrayList<Player> playerListGameEnd = new ArrayList<>();
     private int rounds;
 
     public Game(){
-
+        play();
     }
 
-
     /*
-    public Store setStore(String storeNameQuestion){
-        String
+    public Game(int rounds, ArrayList<Player> players, Store store){
+        this.rounds = rounds;
+        this.players = players;
+        this.store = store;
     }
     */
 
     /*
-    a) Köpa max så många djur som hen har pengar till(varje typ av djur har ett ursprungspris, oavsett kön).
-    b) Köpa max så mycket mat som hen har pengar till(mat köps i kg och har kilopris)
-    c) Mata sina djur(vilken slags mat måste anges för varje djur man vill mate)
-    d) Försöka få ett par djur att para sig, då skapas i 50% av fallen nya djur man äger(om djuren är av samma slag och olika
-      olika kön, olika slags djur kan inte para sig). Om parningen lyckas kan spelaren döpa det/de nya djuret/djuren(olika
-      slags djur kan ha olika många ungar/parning). Könet på djuren som skapas vid parning slumpas(50%/50%)
-    e) Sälja ett/flera djur(priset är ursprungspriset gånger hälsovärdet)
-    */
+    private void saveSession(int rounds, ArrayList<Player> players, Store store){
+        Game saveGame = new Game(rounds, players, store);
+        String nameSession = IO.stringPrompt("Name saving file: ");
+        Session session = new Session(saveGame, nameSession);
+        FileManagement.save(session);
+    }
 
-    // jag måste hålla koll på vilken spelares tur det är
-    //metoden heter run eller session kanske?
-
-    /*
-    private void playerList(){
+    private void loadSession(){
+        ArrayList<Session> sessions = FileManagement.load();
+        System.out.println("SAVED");
         int i = 1;
-        for(Player player : this.getPlayers()){
-            System.out.println(i + ". " + player.getName());
+        for(Session session : sessions){
+            System.out.println(i + ". game: " + session.getName() + ", saved: " + session.getDate());
             i++;
         }
+        int choice = IO.promptInt("Pick a saved game file to load") - 1;
+        Session chosenSession = sessions.get(choice);
+        Game game = chosenSession.getGame();
+        int rounds = game.getRounds();
+        ArrayList<Player> playerList = game.getPlayers();
+        Store store = game.getStore();
     }
     */
+
+    public Store getStore(){
+        return store;
+    }
 
     private void printFoods(Player player){
         int i = 1;
@@ -112,11 +118,14 @@ public class Game {
     }
 
     public void sell(Player player){
-        String choice = IO.stringPrompt("Sell one(input: 1) or x amount(input: x)?").toLowerCase();
+        String choice = IO.stringPrompt("Sell one(input: 1) or x amount(input: x)?" +
+                                      "\n(animals: " + player.getAnimals().size() + ")").toLowerCase();
+        Animal animal;
         switch(choice){
             case "1":
                 printAnimals(player);
                 int animalChoice = IO.promptInt("Pick an animal to sell") - 1;
+                //animal = player.getAnimals().get(animalChoice);
                 player.sell(player.getAnimals().get(animalChoice));
                 break;
             case "x":
@@ -126,23 +135,19 @@ public class Game {
                 while(counter < amount){
                     printAnimals(player);
                     animalChoice = IO.promptInt("Pick an animal to sell") - 1;
+                    //animal = player.getAnimals().get(animalChoice);
                     player.sell(player.getAnimals().get(animalChoice));
                     counter++;
                 }
                 break;
         }
-        /*
-        printAnimals(player);
-        int animalChoice = IO.promptInt("Pick an animal to sell") - 1;
-        player.sell(player.getAnimals().get(animalChoice));
-        */
     }
 
     private void startMenu(){
         int choice = IO.startMenu("Store Simulator 2020",
                 "Help",
                          "Play",
-                         "Load game",
+                         "Load game - FUNKAR EJ",
                          "Exit");
         switch(choice){
             case 1:
@@ -152,7 +157,8 @@ public class Game {
                 run();
                 break;
             case 3:
-                // load()
+                //loadSession();
+                break;
             case 4:
                 break;
         }
@@ -160,7 +166,9 @@ public class Game {
 
     private void help(){
         System.out.println("Store Simulator 2020\nInstructions: ");
-
+        System.out.println("You select amount of rounds and amount of players\n" +
+                "You can buy animals or food each round, or you can sell animals or breed them\n" +
+                "Goal is to survive the longest by having money or animals left");
         startMenu();
 
     }
@@ -181,27 +189,6 @@ public class Game {
         }
     }
 
-    private void store(){
-        //new Store();
-        String choice = IO.stringPrompt("List animal or food in store");
-        switch(choice.toLowerCase()){
-            case "animal":
-                listStoreAnimals();
-                break;
-            case "food":
-                listStoreFoods();
-                break;
-        }
-    }
-
-    // här bör följande nog vara:
-    // metod för att dra ner djurens hälsa för varje rond
-    // chansen att ett djur blir sjukt
-    // samt någonstans måste kontroll finnas för att om djuret har 0 liv då är det dött
-    // options och metoder att lägga till ev
-    // save
-    // saved
-    // exit
     private void run(){
         String deathNote = "";
         String roundStats = "";
@@ -212,22 +199,21 @@ public class Game {
         int playerCount = getPlayerCount();
         int rounds = setRounds("Enter rounds(5-30): ");
         int counter = 0;
-        int nummy = 1;
-        while(counter < rounds && !players.isEmpty()){
-            System.out.println(nummy);
-            nummy++;
-            System.out.println(deathNote);
-            System.out.println(roundStats);
-            //healthDecrement(this.players); //detta stoppar körningen
-            int choice = IO.gameOptions("Store Simulator 2020", setGameStatsEachRound(),
+        int roundCounter = 1;
+        boolean quit = false;
+        while(counter < rounds && !players.isEmpty() && !quit){
+            String lastRound = deathNote + "\n" + roundStats;
+            int choice = IO.gameOptions(lastRound,"Store Simulator 2020", roundCounter, setGameStatsEachRound(),
                     "Buy max amount animals/foods", // 1
                                  "Feed animal", // 2
                                  "Breed", // 3
                                  "Sell animal/s", // 4
-                                 "Store", // 5
-                                 "Save", // 6
+                                 "Store(Strunta i denna , denna fanns bara för att jag skulle testa rundornas gång)", // 5
+                                 "Save - FUNKAR EJ", // 6
                                  "Exit"); //
+            roundCounter++;
             for(Player player : this.getPlayers()){
+                illness(player);
                 //System.out.println(player.getName() + "s turn");
                 switch(choice){
                     case 1:
@@ -247,82 +233,85 @@ public class Game {
                         sell(player);
                         break;
                     case 5:
-                        //store(); ha detta i ettan istället då jag inte kan lösa det nu..
                         break;
                     case 6:
-                        //save();
-                        //break;
+                        break;
                     case 7:
-                        //exit här kanske ngn erase metod måste finnas, och sen tillbaka till startmenu
+                        quit = true;
                         break;
                 }
             }
-            healthDecrement(getPlayers()); //detta stoppar körningen
+            healthDecrement(getPlayers());
             deathNote = deathInfo(getPlayers());
             roundStats = nextRound();
 
-            //cleanOut(getPlayers()); // en metod som går igenom listan och tar bort animals om dem är döda
-            //System.out.println(animalInfo);
-            //nextRound();
             counter++;
-            //Store.clearEmptyStock();
+        }
+        if(quit){
+            startMenu();
         }
         // använd här metoden för gameEnd ? när spelet är slut ska vissa saker göras
         gameEnd();
         startMenu();
     }
 
-    private void healthDecrement(ArrayList<Player> players){
-        /*
-        StringBuilder sb = new StringBuilder();
-        for(Player player : players){
-            while(!player.getAnimals().isEmpty()){
-                for(Animal animal : player.getAnimals()){
-                    double rand = new Random().nextInt(21) + 10;
-                    double newHealth = animal.getHealthPoints() - rand;
-                    animal.setHealthPoints(newHealth);
-                }
-
-            }
-        }
-        */
-        /*
-        StringBuilder sb = new StringBuilder();
-        for(Player player : players){
-            if(player.getAnimals().isEmpty()){
-
-            }else{
-                sb.append(player.getName());
-                for(Animal animal : player.getAnimals()){
-                    double rand = new Random().nextInt(21) + 10;
-                    //double percentage = rand / 100;
-                    //double healthDec = animal.getHealthPoints() * (rand/100);
-                    //double newHealth = animal.getHealthPoints() - healthDec;
-                    //double newHealth = animal.getHealthPoints() * percentage;
-                    double newHealth = animal.getHealthPoints() - rand;
-                    animal.setHealthPoints(newHealth);
-
-                    if(player.dead(animal)){
-                        sb.append(" ").append(player.dead(animal));
+    private void illness(Player player){
+        if(!player.getAnimals().isEmpty()){
+            for(int i = 0; i < player.getAnimals().size(); i++){
+                Animal animal = player.getAnimals().get(i);
+                double r = Math.round((new Random().nextDouble() * 10) / 10);
+                if(r >= 0.0 && r <= 0.2){
+                    double vetCost = vetFee(animal);
+                    String decision = IO.stringPrompt("Animal: " + animal.getSpecie() + " is sick" +
+                            "\nDo you want to give medical(input: med) attention or end it(input: end)?").toLowerCase();
+                    switch(decision){
+                        case "med":
+                            if(player.getMoney() < vetCost){
+                                System.out.println("You can't afford treatment");
+                                //om man inte kan betala veterinärskostnad då dör djuret och tas bort
+                                player.getAnimals().remove(animal);
+                            }else if(vet()){
+                                System.out.println("Animal was treated");
+                                animal.setHealthPoints(100);
+                                player.setBalance(player.getMoney() - vetCost);
+                            }else{
+                                System.out.println("Animal dead");
+                                player.getAnimals().remove(animal);
+                            }
+                            //komma tillbaka till spelet
+                            break;
+                        case "end":
+                            System.out.println("You chose to make it sleepy");
+                            player.getAnimals().remove(animal);
+                            //komma tillbaka till spelet
+                            break;
                     }
-
                 }
-                sb.append("\n");
             }
         }
-        return sb.toString();
+    }
 
-        */
+    private boolean vet(){
+        return new Random().nextBoolean();
+    }
 
+    private double vetFee(Animal animal){
+        double cost = 0.0;
+        if(animal instanceof Mammal){
+           cost = 100.0;
+        }else if(animal instanceof Bird){
+            cost = 50.0;
+        }else if(animal instanceof Fish){
+            cost = 25.0;
+        }
+
+        return cost;
+    }
+
+    private void healthDecrement(ArrayList<Player> players){
         for(Player player : players){
             if(!player.getAnimals().isEmpty()){
                 for(int i = 0; i < player.getAnimals().size(); i++){
-                    /*
-                    såhär kan djuret aldrig dö
-                    double rand = new Random().nextInt(21) + 10;
-                    double percentage = rand / 100;
-                    double newHealth = animal.getHealthPoints() * (1 - percentage);
-                    */
                     Animal animal = player.getAnimals().get(i);
                     double rand = new Random().nextInt(21) + 10;
                     double newHealth = animal.getHealthPoints() - rand;
@@ -342,10 +331,6 @@ public class Game {
         return msg;
     }
 
-    private void sickness(){
-
-    }
-
     private Player returnWinner(){
         return playersEnd.stream().max(Comparator.comparing(Player::getMoney)).get();
     }
@@ -357,10 +342,7 @@ public class Game {
     Jag måste alltså rensa alla listor som tillhör en match när run metoden i game körs
     */
     private void refresh(){
-        // jag tror det räcker med att rensa i FileManagement klassen ist
         FileManagement.refresh();
-        //Store.clearAnimalStock();
-        //Store.clearFoodStock();
         players.clear();
     }
 
@@ -375,7 +357,6 @@ public class Game {
         }
         IO.prompt("End results: ");
         for(Player player : playersEnd){
-            //IO.prompt(String.valueOf(player.getMoney()));
             System.out.println(player.getMoney());
         }
 
@@ -393,7 +374,6 @@ public class Game {
         }
     }
 
-    //denna metod kanske behövs varje rond för att se vilka spelare som ska fortsätta
     private String nextRound(){
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < players.size(); i++){
@@ -429,26 +409,10 @@ public class Game {
         StringBuilder sb = new StringBuilder();
 
         for(Player player : this.getPlayers()){
-            sb.append(player.toString()).append("\n");
+            sb.append(player.toString()).append("\n").append("-".repeat(50)).append("\n");
         }
         return sb.toString();
     }
-
-    private void setAnimals(){
-        FileManagement.createAnimal();
-    }
-
-    private void setFoods(){
-        FileManagement.createFood();
-    }
-
-    /*
-    private void setPlayers(String playersQuestion){
-        int playerAmount = IO.promptInt(playersQuestion);
-        Player.setPlayer(playerAmount, this.getPlayers());
-    }
-    */
-
 
     private int setRounds(String question){
         int rounds = IO.promptInt(question);
@@ -466,14 +430,6 @@ public class Game {
         }
     }
 
-    public static void addPlayers(){
-
-    }
-
-    public static void openStore(){
-
-    }
-
     public int getPlayerCount(){
         return players.size();
     }
@@ -482,58 +438,7 @@ public class Game {
         return players;
     }
 
-    //**
-    //**
-    //**
-    //Metoder för att kolla så att programmet funkar
-    private static void printStoreAnimals(){
-        for(Animal animal : Store.getAnimalStock()){
-            System.out.println(animal.toString());
-        }
+    public int getRounds(){
+        return rounds;
     }
-
-    private static void printStoreFood(){
-        for(Food food : FileManagement.getFoods()){
-            System.out.println(food.toString());
-        }
-    }
-
-    // test för att se ifall player skapandet fungerar som det ska
-    private void createAndDisplayPlayer(){
-        int amount = IO.promptInt("How many players are to be created?");
-        setPlayer(amount);
-        for(Player player : players){
-            System.out.println(player.toString());
-        }
-    }
-
-    public static void main(String[] args){
-        //FileManagement.readAnimalsIn();
-
-        //for(String[] attr : FileManagement.getAttributeValuesAnimal()){
-          //  System.out.println(Arrays.toString(attr));
-        //}
-        Game g = new Game();
-        g.play();
-        //FileManagement.createAnimal();
-        //printStoreAnimals();
-
-
-
-        //FileManagement.printClassesAnimalsAdded();
-        //FileManagement.createFood();
-
-        //System.out.println(FileManagement.getAnimals().isEmpty());
-        //printStoreAnimals();
-        /*
-        ArrayList<Animal> animalList = FileManagement.getAnimals();
-        for(Animal animal : animalList){
-            System.out.println(animal.toString());
-        }
-        */
-        //System.out.println("-".repeat(50));
-        //printStoreFood();
-    }
-
-
 }

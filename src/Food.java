@@ -1,4 +1,6 @@
-abstract class Food {
+import java.io.Serializable;
+
+abstract class Food implements Serializable {
     private String food;
     private int pricekg;
     private int weight;

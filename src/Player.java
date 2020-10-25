@@ -1,9 +1,10 @@
 import jdk.swing.interop.SwingInterOpUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Player {
+public class Player implements Serializable {
     private String name;
     private double money;
     private ArrayList<Animal> animals;
@@ -11,7 +12,7 @@ public class Player {
 
     public Player(String name){
         this.name = name;
-        this.money = 1000;
+        this.money = 2000;
         this.animals = new ArrayList<>();
         this.foods = new ArrayList<>();
     }
@@ -140,12 +141,12 @@ public class Player {
     private String animalsList(){
         StringBuilder sb = new StringBuilder();
         if(getAnimalCount() == 0){
-            sb.append("\n(Player ").append(getName()).append("): You currently don't own any animals, buy some in the store");
+            sb.append("(Player ").append(getName()).append("): You currently don't own any animals, buy some in the store");
         }else{
-            sb.append("Player: " + getName() + "s animals:");
-            int i = 0;
+            sb.append("Player: ").append(getName()).append("s animals:\n");
+            int i = 1;
             for(Animal animal : this.getAnimals()){
-                sb.append(i+1).append(animal.getSpecie()).append(", health: ").append(animal.getHealthPoints()).append("\n");
+                sb.append(i).append(". ").append(animal.getSpecie()).append(", health: ").append(animal.getHealthPoints()).append("\n");
                 i++;
             }
         }
@@ -159,9 +160,9 @@ public class Player {
             sb.append("(Player ").append(getName()).append("): You currently don't own any food, buy some in the store");
         }else{
             sb.append("Player: ").append(getName()).append("s food:\n");
-            int i = 0;
+            int i = 1;
             for(Food food : this.getFood()){
-                sb.append(i+1).append(". ").append(food.getFood()).append(", weight: ").append(food.getWeight()).append("kg").append("\n");
+                sb.append(i).append(". ").append(food.getFood()).append(", weight: ").append(food.getWeight()).append("kg").append("\n");
                 i++;
             }
         }
@@ -260,7 +261,7 @@ public class Player {
 
     public String toString(){
         return "name: " + this.name + ", balance: " + this.getMoney() +
-                animalsList() +
+                "\n" + animalsList() +
                 "\n" + foodList();
     }
 
