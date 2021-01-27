@@ -15,38 +15,6 @@ public class Game implements Serializable {
         play();
     }
 
-    /*
-    public Game(int rounds, ArrayList<Player> players, Store store){
-        this.rounds = rounds;
-        this.players = players;
-        this.store = store;
-    }
-    */
-
-    /*
-    private void saveSession(int rounds, ArrayList<Player> players, Store store){
-        Game saveGame = new Game(rounds, players, store);
-        String nameSession = IO.stringPrompt("Name saving file: ");
-        Session session = new Session(saveGame, nameSession);
-        FileManagement.save(session);
-    }
-
-    private void loadSession(){
-        ArrayList<Session> sessions = FileManagement.load();
-        System.out.println("SAVED");
-        int i = 1;
-        for(Session session : sessions){
-            System.out.println(i + ". game: " + session.getName() + ", saved: " + session.getDate());
-            i++;
-        }
-        int choice = IO.promptInt("Pick a saved game file to load") - 1;
-        Session chosenSession = sessions.get(choice);
-        Game game = chosenSession.getGame();
-        int rounds = game.getRounds();
-        ArrayList<Player> playerList = game.getPlayers();
-        Store store = game.getStore();
-    }
-    */
 
     public Store getStore(){
         return store;
@@ -365,22 +333,10 @@ public class Game implements Serializable {
     private Player returnWinner(){
 
         return playersEnd.stream().max(Comparator.comparing(Player::getMoney)).orElse(players.get(0));
-        /*
-        double winner = 0;
-        for(int i = 0; i < players.size()-1; i++) {
-            for(int j = 1; j < players.size(); j++) {
 
-            }
-        }
-        */
     }
 
-    //newgame metod som tar bort allt som lagrats från föregående spelomgång
-    /*
-    Om man spelar en runda då har ett visst antal och typer av objekt lagrats, och spelare också.
-    När man sen kör ett nytt spel, kör spelet på samma objekt från föregående match plus de nya.
-    Jag måste alltså rensa alla listor som tillhör en match när run metoden i game körs
-    */
+
     private void refresh(){
         FileManagement.refresh();
         players.clear();

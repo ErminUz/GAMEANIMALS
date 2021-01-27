@@ -19,14 +19,6 @@ abstract class Animal implements Serializable {
     private boolean sick;
 
 
-    /*
-    ett djur kan äta 1-3 sorters mat man har. Jag har 3 sorters klasser: carbs, fat och protein. Jag hade kunnat lägga in
-    en siffra 1-3 som indikerar på hur många sorter djuret kan äta. Tex en häst hade fått 2 vilka är carbs och fat. Men då
-    uppstår problemet att jag måste lägga till detta i textfilen, strängar för vilka sorter dem kan äta.
-    Och då behövs nog inte siffran
-    private ArrayList<String> preferedFood;
-
-    */
 
     //for offspring
     Animal(String specie){
@@ -55,21 +47,6 @@ abstract class Animal implements Serializable {
         this.setPrice(price);
     }
 
-    /*
-    private int calcHPBuff(int weight){
-        String num = String.valueOf(weight);
-        boolean decimal = num.contains(",");
-        if(decimal){
-            int numLe
-        }
-        int numLength = String.valueOf(weight).length();
-        if(numLength == 1){
-
-        }else if(numLength == 2){
-
-        }
-    }
-    */
 
     private void increaseHealth(){
 
@@ -81,16 +58,6 @@ abstract class Animal implements Serializable {
             this.preferableFoods = whatAnimalsEat.get(this.getSpecie());
         }
 
-        /*
-        HashMap<String, List<String>> whatAnimalsEat = FileManagement.getWhatAnimalsEatStorage();
-        for(String specie : whatAnimalsEat.keySet()){
-            for(Animal animal : FileManagement.getAnimals()){
-                if(animal.getSpecie().equals(specie)){
-                    this.preferableFoods = whatAnimalsEat.get(specie);
-                }
-            }
-        }
-        */
     }
 
 
@@ -144,19 +111,7 @@ abstract class Animal implements Serializable {
         }
         System.out.println("(updated food weight: " + food.getWeight() + "kg)\n(from: " + originalFoodWeight + "kg)");
 
-        /*
-        // kolla om djuret har maten i sin lista i hashmap
-        if(canEat(food)){ // && this.getHealthPoints() < 100
-            //int foodWeight = IO.promptInt("Enter food in grams: ");
-            double updatedHealth = healthBuff(amount, this);
-            this.setHealthPoints(updatedHealth);
-            int newFoodStock = (int) ((food.getWeight() * 1000) - amount) / 1000;
-            food.setWeight(newFoodStock);
-            System.out.println("eating");
-        }else{
-            System.out.println("animal doesnt eat that or has already full hp");
-        }
-        */
+
     }
 
     //50 % chans att födelsen går igenom. Om det blir 1 går den igenom annars false
@@ -166,40 +121,6 @@ abstract class Animal implements Serializable {
         return new Random().nextBoolean();
         //return ThreadLocalRandom.current().nextInt(0, 2) + 1 == 1;
     }
-
-
-    //denna metod kanske bör istället vara i player klassen, och kallas breed.
-    /*
-    public void mate(Animal male, Animal female){
-        if(male instanceof Bird && female instanceof Bird){
-            if(birth()){
-                System.out.println("Birth went well");
-                Bird offspring = new Bird();
-                male.offspring.add(offspring);
-                female.offspring.add(offspring);
-            }else{
-                System.out.println("Miscarriage...");
-            }
-        }else if(male instanceof Fish && female instanceof Fish){
-            if(birth()){
-                System.out.println("Birth went well");
-                Fish offspring = new Fish();
-                male.offspring.add(offspring);
-                female.offspring.add(offspring);
-            }else{
-                System.out.println("Miscarriage...");
-            }
-        }else if(male instanceof Mammal && female instanceof Mammal){
-            if(birth()){
-                System.out.println("Birth went well");
-                Mammal offspring = new Mammal();
-                male.offspring.add(offspring);
-                female.offspring.add(offspring);
-            }
-        }
-    }
-
-     */
 
 
     public void setSpecie(String specie){
@@ -274,17 +195,6 @@ abstract class Animal implements Serializable {
 
     }
 
-    /*
-    public String whatIEat(){
-        StringBuilder sb = new StringBuilder();
-        //sb.append(this.getSpecie());
-        for(String food : preferableFoods){
-            sb.append(food).append(" ");
-        }
-
-        return sb.toString();
-    }
-    */
 
 
 }

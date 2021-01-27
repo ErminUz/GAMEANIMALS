@@ -9,16 +9,6 @@ public class Store {
     public ArrayList<Food> foodStockSaved = new ArrayList<>();
 
 
-    /*
-    public static Store saveStore(ArrayList<Animal> animal, ArrayList<Food> food){
-        return new Store(animal, food);
-    }
-
-    public Store(ArrayList<Animal> animals, ArrayList<Food> foods){
-        this.animalStockSaved = animals;
-        this.foodStockSaved = foods;
-    }
-    */
 
     public static void addAnimal(Animal animal){
         animalStock.add(animal);
@@ -76,13 +66,7 @@ public class Store {
     }
 
     private static void listFoods(){
-        /*
-        int i = 0;
-        for(Food food : foodStock){
-            System.out.println((i+1) + food.toString());
-            i++;
-        }
-        */
+
     }
 
     private static ArrayList<Food>  removeEmptyStock(){
@@ -94,17 +78,7 @@ public class Store {
                 update.add(food);
             }
         }
-        /*
-        ArrayList<Food> updated = foodStock;
-        for(Food food : foodStock){
-            if(food.removeFromStock()){
-                foodStock.remove(food);
-            }else{
-                updated.add(food);
-            }
-        }
-        foodStock = updated;
-        */
+
         return update;
     }
 
@@ -167,33 +141,11 @@ public class Store {
             // innuti här ska spelaren samla på sig så mycket djur den kan och sålänge den har råd
             Collections.shuffle(animalStock); // tror man får ha en ny referens typ här, en ny arrayList
 
-            // måste hantera bättre om du inte har pengar, denna säger inte åt användaren tydligt
-            /*
-            int i = 0;
-            while(canAffordAnything(player) > 0){
-                //player.getAnimals().add(animalStock.get(i));
-                player.addAnimal(animalStock.get(i));
-                animalStock.remove(animalStock.get(i));
-                double balance = player.getMoney() - animalStock.get(i).getPrice();
-                player.setBalance(balance);
-                i++;
-            }
-            */
+
             int i = 0;
             boolean buy = true;
             while(buy){
-                /*
-                if(canAffordAnything(player) > 0 && !animalStock.isEmpty()){
-                    player.addAnimal(animalStock.get(i));
-                    double balance = player.getMoney() - animalStock.get(i).getPrice();
-                    player.setBalance(balance);
-                    animalStock.remove(animalStock.get(i));
-                    System.out.println(player.getMoney());
-                    i++; //gav körningsfel
-                }else{
-                    System.out.println("Can't afford anything");
-                    buy = false;
-                }*/
+
                 if(canAffordAnything(player) > 0 && !animalStock.isEmpty()) {
                     for(int j = 0; j < animalStock.size(); j++) {
                         if(player.getMoney() < animalStock.get(j).getPrice()) {
@@ -260,25 +212,10 @@ public class Store {
             }
             //IO.prompt("That's all you can buy");
         }else if(choice.toLowerCase().equals("food") && selectOrRandom.toLowerCase().equals("aut")){
-            // buy as long as possible; as long as player can afford it. How do deal with amount...?
-            // player can choose a amount and the rest is randomized; type of food being bought.
+
             int amountGrams = IO.promptInt("Enter amount you wish to buy in grams");
-            // now buy set amount x type food as long as there's food and player can afford
-            // while?
-            /*
-            for(Food food : keepFoodListUpdated()){
-                while(canAfford(player, amountGrams, food) && !foodStock.isEmpty()){
-                    player.addFood(food, (amountGrams / 1000));
-                    int price = amountGrams * (food.getPricekg() / 1000);
-                    player.setBalance(player.getMoney() - price);
-                    food.setWeight(food.getWeight() - amountGrams);
-                }
-            }
-            */
             boolean run = true;
 
-            //ArrayList<Food> updatedList = keepFoodListUpdated();
-            //ArrayList<Food> updatedList = removeIfEmpty();
             while(run){
                 for(Food food : foodStock){
                     Food foodToAdd = addFoodToPlayerFoodList(food.getClass().getSimpleName(), food.getFood(), food.getPricekg(), (amountGrams / 1000));
@@ -288,12 +225,6 @@ public class Store {
                         player.setBalance(balance);
                         String classFoodName = food.getClass().getSimpleName();
 
-                        //Food foodToAdd =
-                         //       addFoodToPlayerFoodList(classFoodName, food.getFood(), food.getPricekg(), (amountGrams / 1000));
-                        // player måste nog ha en metod för att uppdatera food listan korrekt
-                        // ändra här till en metod updateFoodList
-                        // den ser till så att endast ett objekt av samma slag visas,
-                        // inte tex flera bananas med samma vikter eller olika
                         player.updateFoodList(foodToAdd);
                         //player.addFood(foodToAdd);
                         food.setWeight(food.getWeight() - (amountGrams / 1000));
@@ -304,9 +235,6 @@ public class Store {
 
             }
             IO.prompt("Bought all you can afford, your balance: " + player.getMoney());
-            //skriva ut vad spelaren köpt eller iaf vad spelaren har nu
-            // jag hade kunnat ha en lista som lägger till allt som handlas för att
-            // kunna skriva ut vad man köpt
             IO.prompt("Food list: ");
             ArrayList<Food> foods = player.getFood();
             for(Food food : foods){
@@ -314,9 +242,6 @@ public class Store {
             }
 
             System.out.println("\n(updated food stock: )");
-            //ArrayList<Food> updated = keepFoodListUpdated();
-            //updatedFoodList();
-            //ArrayList<Food> stock = removeIfEmpty();
             for(Food food : foodStock){
                 System.out.println(food.getFood() + ", weight: " + food.getWeight() + "kg");
             }
@@ -346,17 +271,6 @@ public class Store {
     }
 
     private static int howMuchCanBeBought(Player player, Food food){
-        /*int foodQuantityInGrams = food.getWeight() * 1000;
-        int foodPricePerGrams = food.getPricekg() / 1000;
-        double balance = player.getMoney();
-        int amountGramsCanBuy = (int) (balance / foodPricePerGrams);
-        System.out.println("såhär mycket kan jag köpa" + amountGramsCanBuy);
-        if(amountGramsCanBuy > foodQuantityInGrams){
-            amountGramsCanBuy = foodQuantityInGrams;
-        }
-
-        return amountGramsCanBuy;
-        */
 
         int foodQuantityInGrams = food.getWeight() * 1000;
         double foodPricePerGram = (double) food.getPricekg() / 1000;
@@ -373,12 +287,7 @@ public class Store {
         return animal.getPrice() * animal.getHealthPoints();
     }
 
-    /*
-    private static void stock(){
-        animalStock = FileManagement.getAnimals();
-        foodStock = FileManagement.getFoods();
-    }
-    */
+
 
     static ArrayList<Animal> getAnimalStock(){
         return animalStock;

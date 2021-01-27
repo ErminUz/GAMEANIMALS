@@ -342,36 +342,6 @@ public class FileManagement {
         return eachLineFoodArr;
     }
 
-    /*
-    private static void loadAddedAnimals(Path file, ArrayList<String[]> addingTo){
-        String info = " ";
-        try{
-            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(file)));
-            while((info = br.readLine()) != null){
-                addingTo.add(info.split(" "));;
-            }
-
-            createAnimalWhileRunning();
-        } catch(IOException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void loadAddedFood(Path file, ArrayList<String[]> addingTo){
-        String info = " ";
-        try{
-            BufferedReader br = new BufferedReader(new FileReader(String.valueOf(textFoods)));
-            while((info = br.readLine()) != null){
-                attributeValuesFood.add(info.split(" "));
-            }
-
-            createFoodWhileRunning(attributeValuesFood);
-        } catch(IOException e){
-            System.out.println(e.getMessage());
-        }
-    }
-    */
-
     //vart ska denna köras ifrån?
     public static void setWhatAnimalEats(){
         readInWhatAnimalEats();
@@ -445,30 +415,4 @@ public class FileManagement {
         whatAnimalsEat.clear();
     }
 
-    /*
-    public static void save(Session session){
-        try{
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(String.valueOf(gameSessionsFile)));
-            oos.writeObject(session);
-            oos.close();
-            System.out.println("Saved game to file: " + session.getDate());
-        } catch(IOException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-
-    public static ArrayList<Session> load(){
-        ArrayList<Session> sessions = new ArrayList<>();
-        try{
-           ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(gameSessionsFile)));
-           sessions.add((Session) ois.readObject());
-           ois.close();
-        } catch(ClassNotFoundException | IOException e){
-            System.out.println(e.getMessage());
-        }
-
-        return sessions;
-    }
-    */
 }

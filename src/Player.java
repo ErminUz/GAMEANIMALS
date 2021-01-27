@@ -56,22 +56,6 @@ public class Player implements Serializable {
         }
     }
 
-    /*
-    public ArrayList<Food> properFoodList(){
-        ArrayList<Food> updated = new ArrayList<>();
-        for(Food food : foods){
-            if(food instanceof Carbs){
-                Carbs carb;
-                for(int i = 1; i < foods.size(); i++){
-                    if(food.getFood().equals(foods.get(i).getFood())){
-
-                    }
-                }
-            }
-        }
-    }
-    */
-
     public void addAnimal(Animal animal){
         animals.add(animal);
     }
@@ -172,16 +156,7 @@ public class Player implements Serializable {
         return new Random().nextBoolean();
     }
 
-    /*
-    public String dead(Animal animal){
-        String msg = "";
-        if(animal.getHealthPoints() == 0){
-            this.animals.remove(animal);
-            msg += animal.getSpecie();
-        }
-        return msg;
-    }
-    */
+
 
     private boolean dead(Animal animal){
         if(animal.getHealthPoints() == 0){
@@ -192,19 +167,6 @@ public class Player implements Serializable {
     }
 
     public String announceDead(){
-        /*StringBuilder sb = new StringBuilder();
-        //sb.append(this.getName()).append(", dead animals: ");
-        for(int i = 0; i < this.getAnimals().size(); i++){
-            Animal animal = this.getAnimals().get(i);
-            sb.append(this.getName()).append(", dead animals: ");
-            if(dead(animal)){
-                this.getAnimals().remove(animal);
-                sb.append(" ").append(animal.getSpecie()).append(" ");
-            }
-        }
-
-        return sb.toString();*/
-
         StringBuilder sb = new StringBuilder();
 
         sb.append(this.getName()).append(" - dead animals: none"); //16-20 - none
@@ -279,14 +241,4 @@ public class Player implements Serializable {
                 "\n" + animalsList() +
                 "\n" + foodList();
     }
-
-    /*
-    public void printAnimalsIncludeTheirFood(Player player){
-        int i = 1;
-        for(Animal animal : player.getAnimals()){
-            System.out.println(i + ". " + animal.getSpecie() + animal.whatIEat());
-            i++;
-        }
-    }
-    */
 }
