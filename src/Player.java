@@ -1,5 +1,3 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,7 +10,7 @@ public class Player implements Serializable {
 
     public Player(String name){
         this.name = name;
-        this.money = 2000;
+        this.money = 5500;
         this.animals = new ArrayList<>();
         this.foods = new ArrayList<>();
     }
@@ -194,7 +192,7 @@ public class Player implements Serializable {
     }
 
     public String announceDead(){
-        StringBuilder sb = new StringBuilder();
+        /*StringBuilder sb = new StringBuilder();
         //sb.append(this.getName()).append(", dead animals: ");
         for(int i = 0; i < this.getAnimals().size(); i++){
             Animal animal = this.getAnimals().get(i);
@@ -205,6 +203,20 @@ public class Player implements Serializable {
             }
         }
 
+        return sb.toString();*/
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.getName()).append(" - dead animals: none"); //16-20 - none
+
+        for(int i = 0; i < this.getAnimals().size(); i++){
+            Animal animal = this.getAnimals().get(i);
+            if(dead(animal)){
+                sb.delete(16, 20);
+                this.getAnimals().remove(animal);
+                sb.append(", ").append(animal.getSpecie());
+            }
+        }
         return sb.toString();
     }
 
@@ -216,6 +228,7 @@ public class Player implements Serializable {
                 male.getOffspring().add(offspring);
                 female.getOffspring().add(offspring);
                 animals.add(offspring);
+                System.out.println(this.animals);
                 //male.offspring.add(offspring);
                 //female.offspring.add(offspring);
             }else{
@@ -228,6 +241,7 @@ public class Player implements Serializable {
                 male.getOffspring().add(offspring);
                 female.getOffspring().add(offspring);
                 animals.add(offspring);
+                System.out.println(this.animals);
                 //male.offspring.add(offspring);
                 //female.offspring.add(offspring);
             }else{
@@ -240,6 +254,7 @@ public class Player implements Serializable {
                 male.getOffspring().add(offspring);
                 female.getOffspring().add(offspring);
                 animals.add(offspring);
+                System.out.println(this.animals);
                 //male.offspring.add(offspring);
                 //female.offspring.add(offspring);
             }else{

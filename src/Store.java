@@ -138,7 +138,7 @@ public class Store {
         listFoodPrices();
         String choice = IO.stringPrompt("Select from animals(input: animal) or food(input: food)?");
         String selectOrRandom = IO.stringPrompt("Manually(input: man) select or auto(input: aut): ");
-        if(choice.toLowerCase().equals("animal") && selectOrRandom.toLowerCase().equals("man")){
+        if(choice.equalsIgnoreCase("animal") && selectOrRandom.equalsIgnoreCase("man")){
             boolean canBuy = true;
             while(canAffordAnything(player) > 0){
                 if(player.getMoney() <= 0){
@@ -163,7 +163,7 @@ public class Store {
                 //i++; //- tror denna ska vara i if satsen inne i else
             }
             IO.prompt("Can't afford anymore animals");
-        }else if(choice.toLowerCase().equals("animal") && selectOrRandom.toLowerCase().equals("aut")){
+        }else if(choice.equalsIgnoreCase("animal") && selectOrRandom.equalsIgnoreCase("aut")){
             // innuti här ska spelaren samla på sig så mycket djur den kan och sålänge den har råd
             Collections.shuffle(animalStock); // tror man får ha en ny referens typ här, en ny arrayList
 
@@ -182,13 +182,30 @@ public class Store {
             int i = 0;
             boolean buy = true;
             while(buy){
+                /*
                 if(canAffordAnything(player) > 0 && !animalStock.isEmpty()){
                     player.addAnimal(animalStock.get(i));
                     double balance = player.getMoney() - animalStock.get(i).getPrice();
                     player.setBalance(balance);
                     animalStock.remove(animalStock.get(i));
+                    System.out.println(player.getMoney());
+                    i++; //gav körningsfel
                 }else{
                     System.out.println("Can't afford anything");
+                    buy = false;
+                }*/
+                if(canAffordAnything(player) > 0 && !animalStock.isEmpty()) {
+                    for(int j = 0; j < animalStock.size(); j++) {
+                        if(player.getMoney() < animalStock.get(j).getPrice()) {
+                            continue;
+                        } else {
+                            player.addAnimal(animalStock.get(j));
+                            double balance = player.getMoney() - animalStock.get(j).getPrice();
+                            player.setBalance(balance);
+                            animalStock.remove(animalStock.get(j));
+                        }
+                    }
+                } else {
                     buy = false;
                 }
             }
@@ -204,6 +221,7 @@ public class Store {
             while(canBuy){
                 // behövs ändå en kontroll ifall player har pengar
                 // finns inge pengar går vi ut ur while
+                System.out.println("Your balance: " + player.getMoney());
                 if(player.getMoney() == 0 || foodStock.isEmpty()){
                     System.out.println("No money or food is out"); // för nu, men ändra så att man vet mer exakt varför
                     canBuy = false;
@@ -216,14 +234,15 @@ public class Store {
                     String subClass = chosenFood.getClass().getSimpleName();
                     String food = chosenFood.getFood();
                     int priceKg = chosenFood.getPricekg();
-                    int priceFoodPerGrams = chosenFood.getPricekg() / 1000;
+                    double priceFoodPerGrams = (double) chosenFood.getPricekg() / 1000;
                     int maxAmountBuy = howMuchCanBeBought(player, chosenFood);
                     IO.prompt("You afford up to following amount: " + maxAmountBuy + "g of " + chosenFood.getFood() + "s");
                     int amountGrams = IO.promptInt("Enter amount you wish to buy in grams");
                     int amountAfford = (int)(priceFoodPerGrams * player.getMoney());
                     if(amountGrams <= maxAmountBuy){
                         IO.prompt("You've bought " + amountGrams + "g of " + chosenFood.getFood() + "s");
-                        int cost = amountGrams * priceFoodPerGrams;
+                        double cost = Math.round(amountGrams * priceFoodPerGrams);
+                        System.out.println("Cost: " + cost);
                         double balance = player.getMoney() - cost;
                         player.setBalance(balance);
                         Food foodToAdd = addFoodToPlayerFoodList(subClass, food, priceKg, (amountGrams / 1000));
@@ -231,9 +250,11 @@ public class Store {
                         //player.addFood(chosenFood, (amountGrams / 1000));
                         chosenFood.setWeight(chosenFood.getWeight() - (amountGrams / 1000));
                         //foodStock.remove(chosenFood); fel
-                        if(chosenFood.getWeight() >= 0){
+                        if(chosenFood.getWeight() <= 0){
                             foodStock.remove(chosenFood);
                         }
+                    } else {
+                        buy(player);
                     }
                 }
             }
@@ -325,15 +346,27 @@ public class Store {
     }
 
     private static int howMuchCanBeBought(Player player, Food food){
-        int foodQuantityInGrams = food.getWeight() * 1000;
+        /*int foodQuantityInGrams = food.getWeight() * 1000;
         int foodPricePerGrams = food.getPricekg() / 1000;
         double balance = player.getMoney();
-        int amountGramsCanBuy = (int) (player.getMoney() / foodPricePerGrams);
+        int amountGramsCanBuy = (int) (balance / foodPricePerGrams);
+        System.out.println("såhär mycket kan jag köpa" + amountGramsCanBuy);
         if(amountGramsCanBuy > foodQuantityInGrams){
             amountGramsCanBuy = foodQuantityInGrams;
         }
 
         return amountGramsCanBuy;
+        */
+
+        int foodQuantityInGrams = food.getWeight() * 1000;
+        double foodPricePerGram = (double) food.getPricekg() / 1000;
+
+        double amountGramsCanBuy = (player.getMoney() / foodPricePerGram);
+        if(amountGramsCanBuy > (food.getWeight() * 1000)) {
+            amountGramsCanBuy = (food.getWeight() * 1000);
+        }
+
+        return (int) amountGramsCanBuy;
     }
 
     static double assessValue(Animal animal){

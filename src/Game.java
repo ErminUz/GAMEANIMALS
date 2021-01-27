@@ -70,6 +70,8 @@ public class Game implements Serializable {
 
     public void breed(Player player){
         Animal male, female;
+        String classMale, classFemale;
+
         int animalOne, animalTwo;
         printAnimals(player);
         animalOne = IO.promptInt("First animal") - 1;
@@ -77,6 +79,13 @@ public class Game implements Serializable {
         printAnimals(player);
         animalTwo = IO.promptInt("Second animal") - 1;
         female = player.getAnimals().get(animalTwo);
+        classMale = male.getClass().toString();
+        classFemale = female.getClass().toString();
+
+        if(!classMale.equals(classFemale)) {
+            breed(player);
+        }
+
         player.breed(male, female);
     }
 
@@ -198,23 +207,33 @@ public class Game implements Serializable {
         setPlayer(playerAmount);
         int playerCount = getPlayerCount();
         int rounds = setRounds("Enter rounds(5-30): ");
-        int counter = 0;
+        int counter = 1;
         int roundCounter = 1;
         boolean quit = false;
-        while(counter < rounds && !players.isEmpty() && !quit){
+        while(counter <= rounds){
+            System.out.println("entering while loop");
             String lastRound = deathNote + "\n" + roundStats;
-            int choice = IO.gameOptions(lastRound,"Store Simulator 2020", roundCounter, setGameStatsEachRound(),
-                    "Buy max amount animals/foods", // 1
-                                 "Feed animal", // 2
-                                 "Breed", // 3
-                                 "Sell animal/s", // 4
-                                 "Store(Strunta i denna , denna fanns bara för att jag skulle testa rundornas gång)", // 5
-                                 "Save - FUNKAR EJ", // 6
-                                 "Exit"); //
-            roundCounter++;
+            //int choice = IO.gameOptions(lastRound,"Store Simulator 2020", roundCounter, setGameStatsEachRound(),
+                    //"Buy max amount animals/foods",
+                                 //"Feed animal",
+                                 //"Breed",
+                                 //"Sell animal/s",
+                                 //"Store(Strunta i denna , denna fanns bara för att jag skulle testa rundornas gång)",
+                                 //"Save - FUNKAR EJ",
+                                 //"Exit");
+            //roundCounter++;
             for(Player player : this.getPlayers()){
-                illness(player);
-                //System.out.println(player.getName() + "s turn");
+                String dead = illness(player);
+                System.out.println(player.getName() + "s turn");
+                int choice = IO.gameOptions(dead, player, lastRound,"Store Simulator 2020", roundCounter, setGameStatsEachRound(),
+                        "Buy max amount animals/foods",
+                        "Feed animal",
+                        "Breed",
+                        "Sell animal/s",
+                        "Store(Strunta i denna , denna fanns bara för att jag skulle testa rundornas gång)",
+                        "Save - FUNKAR EJ",
+                        "Exit");
+                System.out.println("COUNTER: " + counter);
                 switch(choice){
                     case 1:
                         System.out.println("(" + player.getName() + "s turn)");
@@ -242,24 +261,27 @@ public class Game implements Serializable {
                 }
             }
             healthDecrement(getPlayers());
-            deathNote = deathInfo(getPlayers());
+            //deathNote = deathInfo(getPlayers());
             roundStats = nextRound();
-
+            roundCounter++;
             counter++;
         }
+        /*
         if(quit){
             startMenu();
         }
+        */
         // använd här metoden för gameEnd ? när spelet är slut ska vissa saker göras
         gameEnd();
         startMenu();
     }
 
-    private void illness(Player player){
+    private String illness(Player player){
         if(!player.getAnimals().isEmpty()){
             for(int i = 0; i < player.getAnimals().size(); i++){
                 Animal animal = player.getAnimals().get(i);
                 double r = Math.round((new Random().nextDouble() * 10) / 10);
+                System.out.println("random num " + r);
                 if(r >= 0.0 && r <= 0.2){
                     double vetCost = vetFee(animal);
                     String decision = IO.stringPrompt("Animal: " + animal.getSpecie() + " is sick" +
@@ -269,26 +291,35 @@ public class Game implements Serializable {
                             if(player.getMoney() < vetCost){
                                 System.out.println("You can't afford treatment");
                                 //om man inte kan betala veterinärskostnad då dör djuret och tas bort
+                                String specie = animal.getSpecie();
                                 player.getAnimals().remove(animal);
+                                return specie;
+
                             }else if(vet()){
                                 System.out.println("Animal was treated");
                                 animal.setHealthPoints(100);
                                 player.setBalance(player.getMoney() - vetCost);
+                                return null;
                             }else{
                                 System.out.println("Animal dead");
+                                String specie = animal.getSpecie();
                                 player.getAnimals().remove(animal);
+                                return specie;
                             }
                             //komma tillbaka till spelet
-                            break;
+                            //break;
                         case "end":
                             System.out.println("You chose to make it sleepy");
+                            String specie = animal.getSpecie();
                             player.getAnimals().remove(animal);
+                            return specie;
                             //komma tillbaka till spelet
-                            break;
                     }
                 }
+                return null;
             }
         }
+        return null;
     }
 
     private boolean vet(){
@@ -332,7 +363,16 @@ public class Game implements Serializable {
     }
 
     private Player returnWinner(){
-        return playersEnd.stream().max(Comparator.comparing(Player::getMoney)).get();
+
+        return playersEnd.stream().max(Comparator.comparing(Player::getMoney)).orElse(players.get(0));
+        /*
+        double winner = 0;
+        for(int i = 0; i < players.size()-1; i++) {
+            for(int j = 1; j < players.size(); j++) {
+
+            }
+        }
+        */
     }
 
     //newgame metod som tar bort allt som lagrats från föregående spelomgång
@@ -348,10 +388,12 @@ public class Game implements Serializable {
 
 
     private void gameEnd(){
+        playersEnd.addAll(players);
+        System.out.println(playersEnd);
         for(Player player : playersEnd){
             if(!player.getAnimals().isEmpty()){
-                for(Animal animal : player.getAnimals()){
-                    player.sell(animal);
+                for(int i = 0; i < player.getAnimals().size(); i++){
+                    player.sell(player.getAnimals().get(i));
                 }
             }
         }

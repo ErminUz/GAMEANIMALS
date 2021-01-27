@@ -53,17 +53,26 @@ public class IO {
         return choice < 1 || choice > options.length ? startMenu(gameName, options) : choice;
     }
 
-    public static int gameOptions(String lastRound, String gameName, int roundNum, String gameStats, String ...gameOptions){
+    public static int gameOptions(String dead, Player player, String lastRound, String gameName, int roundNum, String gameStats, String ...gameOptions){
         clear();
         System.out.println("-".repeat(50));
         System.out.println(gameName);
         System.out.println("(round: " + roundNum + ")");
-        System.out.println("--------------------LAST ROUND--------------------");
-        System.out.println(lastRound);
+        if(roundNum > 1) {
+            System.out.println("--------------------LAST ROUND--------------------");
+            if(dead == null) {
+                System.out.println("PLAYER " + player.getName() + ": No animals dead from last round");
+            } else {
+                System.out.println("PLAYER " + player.getName() + ": " + dead + " died last round ");
+            }
+            System.out.println(lastRound);
+        }
         System.out.println("---------------------ROUND " + roundNum + "----------------------");
         System.out.println(gameStats);
         System.out.println("-".repeat(50));
-        //System.out.println(player.getName() + "s turn");
+        System.out.println(player.getName() + "s turn");
+        System.out.println("-".repeat(50));
+
 
         int i = 1;
         for(String option : gameOptions){
@@ -79,7 +88,7 @@ public class IO {
             System.out.println(e.getMessage());
         }
 
-        return choice < 1 || choice > gameOptions.length ? gameOptions(lastRound, gameName, roundNum, gameStats, gameOptions) : choice;
+        return choice < 1 || choice > gameOptions.length ? gameOptions(dead, player, lastRound, gameName, roundNum, gameStats, gameOptions) : choice;
     }
 
 }

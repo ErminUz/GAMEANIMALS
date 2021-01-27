@@ -10,11 +10,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FileManagement {
     // filen som läses vid start och gör objekt av djuren ur textformatet
-    private static Path textAnimals = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/Animals");
-
+    //private static Path textAnimals = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/Animals");
+    private static Path textAnimals = Paths.get("/home/cb/IdeaProjects/GAMEANIMALS/resource/Animals");
     // filen som läses vid start och gör objekt av djuren ur textformatet
-    private static Path textFoods = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/Foods");
-
+    //private static Path textFoods = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/Foods");
+    private static Path textFoods = Paths.get("/home/cb/IdeaProjects/GAMEANIMALS/resource/Foods");
     // filen som läses när metoden add animal väljs. Förmodat att man skrivit till fil innan man kallar metod
     private static Path textAddAnimals;
 
@@ -22,7 +22,7 @@ public class FileManagement {
     private static Path textAddFoods;
 
     //
-    private static Path whatAnimalEats = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/animalEats");
+    private static Path whatAnimalEats = Paths.get("/home/cb/IdeaProjects/GAMEANIMALS/resource/animalEats");
 
     // förmodligen för om jag klarar funktionen spara gaming session för att återuppta senare
     private static Path gameSessionsFile = Paths.get("/Users/macbook/IdeaProjects/GAMEANIMALS/resource/gameSessions.ser");
